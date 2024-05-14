@@ -76,7 +76,7 @@ const App = () => {
     <div className="container">
       <BrowserRouter>
         <Routes>
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/todo"

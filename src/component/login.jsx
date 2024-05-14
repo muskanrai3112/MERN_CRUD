@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
 
@@ -7,29 +7,51 @@ const Login = () => {
   const navigate = useNavigate();
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const finishSubmit = () => {
+    console.log(username, password);
+  };
+
+  useEffect(() => {
+    if (Object.keys(errors).length === 0 && submitting) {
+      finishSubmit();
+    }
+  }, [errors]);
+
+  const validateVate = () => {
+    let errors = {};
+    if (username.length == 0) {
+      errors.username = "username is required";
+    }
+    if (password.length == 0) {
+      errors.password = "username is required";
+    }
+    return errors;
+  };
 
   const handleOnLogin = (e) => {
+    setErrors();
+    setSubmitting(true);
+    validateVate(username, password);
     e.preventDefault();
-    if (username === 0 || password === 0) {
-      setError(true);
-    } else {
-      const data = {
-        name: username,
-        password: password,
-      };
+    const data = {
+      name: username,
+      password: password,
+    };
 
-      axios
-        .post("http://localhost:4000/login", data)
-        .then((res) => {
-          console.log(res.data);
-          if (res.data) {
-            localStorage.setItem("data", res?.data);
-            navigate("/todo");
-          }
-        })
-        .catch((err) => console.log(err, "error"));
-    }
+    axios
+      .post("http://localhost:4000/login", data)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data) {
+          localStorage.setItem("data", res?.data);
+          navigate("/todo");
+        }
+      })
+      .catch((err) => console.log(err, "error"));
   };
   return (
     <div
@@ -80,11 +102,6 @@ const Login = () => {
             value={username}
             onChange={(e) => setUserName(e.target.value)}
           />
-          {error ? (
-            <span style={{ color: "red" }}>the field cant be empty </span>
-          ) : (
-            ""
-          )}
           <br /> <br />
           <input
             style={{
@@ -99,11 +116,6 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {error ? (
-            <span style={{ color: "red" }}>the field cant be empty </span>
-          ) : (
-            ""
-          )}
           <br /> <br />
           <button
             style={{
